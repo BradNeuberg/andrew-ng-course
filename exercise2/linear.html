@@ -6,29 +6,111 @@
         <script src="../lib/browser-lib/q.js"></script>
 
         <script>
-            document.addEventListener('DOMLoaded', function(){
+            /**
+             * How many significant digits our data sets have; useful for
+             * pretty printing matrix values during debugging.
+             */
+            numeric.precision = 8;
 
+            /**
+             * Our gradient descent rate.
+             */
+            var ALPHA = 0.07;
+
+            /**
+             * The number of features in our input data set.
+             */
+            var NUM_FEATURES = 1;
+
+            /**
+             * The number of iterations to run our gradient descent algorithm until we've converged
+             * on a solution.
+             */
+            var NUM_ITERATIONS = 1500;
+
+            document.addEventListener('DOMContentLoaded', function(){
+                Q.fcall(loadData)
+                        .then(prepareData)
+                        .then(batchGradientDescent)
+                        .fail(function(error){
+                            alert('Unable to run exercise: ' + error);
+                        });
             });
 
+            /**
+             * Load our data files that contain age (x) and height (y).
+             */
             function loadData(){
-
+                return Q.all([
+                    loadFile('ex2x.dat'),
+                    loadFile('ex2y.dat')
+                ]);
             }
 
-            function unzipData(){
-
+            /**
+             * Load an individual data file and convert it to an array of
+             * numeric floats.
+             */
+            function loadFile(fileName){
+                var deferred = Q.defer();
+                var xhr = new XMLHttpRequest();
+                xhr.onreadystatechange = function(){
+                    if (xhr.readyState === 4 && xhr.status === 200){
+                        deferred.resolve(textToArray(xhr.responseText));
+                    } else if (xhr.readyState === 4 && xhr.status !== 200){
+                        var msg = 'Unable to load data file "' + fileName + '": ' +
+                                xhr.status + ' ' + xhr.statusText;
+                        deferred.reject(new Error(msg));
+                    }
+                };
+                xhr.open('GET', fileName, true /* async */);
+                xhr.send();
+                return deferred.promise;
             }
 
-            function prepareData(){
-
+            /**
+             * Transforms one of our data files from strings to an array of floats.
+             */
+            function textToArray(textData){
+                // The floats are each on their own line.
+                return textData.split('\n').map(function(entry){
+                    return parseFloat(entry.trim());
+                }).filter(function(entry){
+                    // The data file has a final blank line; filter this out.
+                    return !isNaN(entry);
+                });
             }
 
-            Q.fcall(loadData)
-                .then(unzipData)
-                .then(prepareData);
+            /**
+             * Transforms our x and y data structures into matrices that we can work with.
+             */
+            function prepareData(data){
+                var x = data[0];
+                var y = data[1];
+
+                // Add a column of ones to x to make our math easier.
+                x = numeric.transpose([numeric.rep([x.length], 1), x]);
+                y = numeric.transpose([y]);
+
+                return {x: x, y: y};
+            }
+
+            function batchGradientDescent(data){
+                var m = data.x.length;
+                var theta = numeric.rep([NUM_FEATURES + 1, 1], 0);
+                for (var i = 0; i < NUM_ITERATIONS; i++){
+                    var gradient = numeric.dot(numeric.transpose(data.x),
+                            numeric.sub(numeric.dot(data.x, theta), data.y));
+                    gradient = numeric.mul((1.0 / m), gradient);
+                    theta = numeric.sub(theta, numeric.mul(ALPHA, gradient));
+                }
+
+                alert('Final theta values=' + numeric.prettyPrint(theta));
+            }
         </script>
     </head>
 
     <body>
-
+        <h1>Exercise 1</h1>
     </body>
 </html>
