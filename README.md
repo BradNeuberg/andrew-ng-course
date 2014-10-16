@@ -1,3 +1,3 @@
-This is a repo for me to work through Andrew Ng's Stanford [Machine Learning course](http://openclassroom.stanford.edu/MainFolder/CoursePage.php?course=MachineLearning).
+This is a repo for me to work through Andrew Ng's Stanford Machine Learning Course. The first set of exercises are from Andrew's original [non-Coursera class](http://openclassroom.stanford.edu/MainFolder/CoursePage.php?course=MachineLearning), while the second set come from the [last half of his Coursera course](https://class.coursera.org/ml-006/lecture). I started working through his original course via Stanford's Open Classroom before I realized there was a Coursera version.
 
 For some of the assignments I've also optionally written them not only in Octave but Python and client-side JavaScript.
