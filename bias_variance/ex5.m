@@ -82,7 +82,7 @@ pause;
 %
 
 %  Train linear regression with lambda = 0
-lambda = 0;
+lambda = 1;
 [theta] = trainLinearReg([ones(m, 1) X], y, lambda);
 
 %  Plot fit over the data
@@ -104,7 +104,7 @@ pause;
 %                 see a graph with "high bias" -- slide 8 in ML-advice.pdf 
 %
 
-lambda = 0;
+lambda = 1;
 [error_train, error_val] = ...
     learningCurve([ones(m, 1) X], y, ...
                   [ones(size(Xval, 1), 1) Xval], yval, ...
@@ -164,7 +164,7 @@ pause;
 %  lambda to see how the fit and learning curve change.
 %
 
-lambda = 0;
+lambda = 1;
 [theta] = trainLinearReg(X_poly, y, lambda);
 
 % Plot training data and fit
@@ -216,5 +216,21 @@ for i = 1:length(lambda_vec)
             lambda_vec(i), error_train(i), error_val(i));
 end
 
+fprintf('Program paused. Press enter to continue.\n');
+pause;
+
+% Using lambda = 3, found via the cross validation data set, compute
+% the error rate for this on our test data.
+lambda = 3;
+theta = trainLinearReg(X_poly, y, lambda);
+
+test_size = size(Xtest, 1);
+error_test = linearRegCostFunction(X_poly_test, ytest, theta, 0);
+
+val_size = size(Xval, 1);
+error_val = linearRegCostFunction(X_poly_val, yval, theta, 0);
+
+printf('Training error for the cross validation set using lambda = 3: %f\n', error_val);
+fprintf('Training error for the test set using lambda = 3: %f\n', error_test);
 fprintf('Program paused. Press enter to continue.\n');
 pause;
