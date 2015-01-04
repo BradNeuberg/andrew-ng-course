@@ -23,11 +23,41 @@ sigma = 0.3;
 %        mean(double(predictions ~= yval))
 %
 
+C_try = [0.01; 0.03; 0.1; 0.3; 1; 3; 10; 30];
+sigma_try = [0.01; 0.03; 0.1; 0.3; 1; 3; 10; 30];
 
+% Store the best C and sigma combination so far given a prediction error rate on our
+% cross validation data set.
+prediction_error = -1;
+C = -1;
+sigma = -1;
 
+% Compute model using each combination of hyperparameters.
+for i = 1:size(C_try, 1)
+  for j = 1:size(sigma_try, 1)
+    this_C = C_try(i);
+    this_sigma = sigma_try(j);
+    model = svmTrain(X, y, this_C, @(x1, x2) gaussianKernel(x1, x2, this_sigma));
 
+    % For each model that is fit, compute predictions based on the cross validation set.
+    predictions = svmPredict(model, Xval);
 
+    % Compute the prediction error and store it if it is better than what we've encountered so far.
+    this_prediction_error = mean(double(predictions ~= yval));
 
+    fprintf('Using C = %f and sigma = %f, prediction error on validation is = %f\n',
+          this_C, this_sigma, this_prediction_error);
+
+    if prediction_error == -1 || this_prediction_error < prediction_error
+      prediction_error = this_prediction_error;
+      C = this_C;
+      sigma = this_sigma;
+    endif
+  end
+end
+
+fprintf('Best C value found: %f\n', C);
+fprintf('Best sigma value found: %f\n', sigma);
 
 % =========================================================================
 
