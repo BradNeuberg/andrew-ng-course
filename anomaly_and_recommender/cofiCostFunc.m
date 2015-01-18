@@ -40,20 +40,21 @@ Theta_grad = zeros(size(Theta));
 %                     partial derivatives w.r.t. to each element of Theta
 %
 
+%for j = 1:num_users
+%  prediction_j = (Theta(j, :) * X')' .* R(:, j);
+%  J += (1 / 2) .* sum((prediction_j - Y(:, j)) .^ 2);
+%  X_grad = prediction_j .* Theta(j, :)';
+%end
 
+difference = ((X * Theta') .* R - Y);
 
+J = (1 / 2) .* sum(sum(difference .^ 2));
+X_grad = difference * Theta;
+Theta_grad = difference' * X;
 
-
-
-
-
-
-
-
-
-
-
-
+J += (lambda / 2) * sum(sum(Theta .^ 2)) + (lambda / 2) * sum(sum(X .^ 2));
+X_grad += lambda * X;
+Theta_grad += lambda * Theta;
 
 % =============================================================
 
